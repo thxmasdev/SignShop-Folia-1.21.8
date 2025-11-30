@@ -11,4 +11,9 @@ Así cambié SignShop para que funcione en Folia 1.21.8:
 - Quité dependencias de compilación que no resolvían y mantuve los hooks opcionales por reflexión (si el plugin externo está presente, se usa; si no, se ignora).
 - Validé compilación y arranque: el plugin construye y carga sin el error de delay inicial.
 
+### Dependencias modificadas
+- Agregada/cambiada: `dev.folia:folia-api` (provided) y repo de Paper.
+- Quitadas del `pom.xml`: Dynmap, Essentials, Residence, BlockLocker, LWC, CMI-API (se usan por reflexión si están instaladas).
+- Mantenidas: VaultAPI, GriefPrevention, WorldGuard, WorldEdit, Towny, BentoBox, LandsAPI, sqlite-jdbc, bstats-bukkit.
+
 Author: ThxmasDev - Discord: thxmasdev
