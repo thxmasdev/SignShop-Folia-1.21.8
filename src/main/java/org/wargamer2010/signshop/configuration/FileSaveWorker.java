@@ -56,7 +56,7 @@ public class FileSaveWorker implements Runnable {
 
     public void stop() {
         try {
-            if (!saveQueue.isEmpty()) {
+            while (!saveQueue.isEmpty()) {
                 saveToFile(saveQueue.poll());
             }
             if (scheduledTask != null) {

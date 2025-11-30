@@ -292,9 +292,9 @@ public class SignShop extends JavaPlugin {
             USE_PERMISSIONS = true;
         Boolean vault_Economy = vault.setupEconomy();
         if (!vault_Economy) {
-            getServer().getPluginManager().registerEvents(new ServerLoadedListener(),this);
             log("Could not hook into Vault's Economy! Signshop will retry after server is loaded.", Level.WARNING);
         }
+        getServer().getPluginManager().registerEvents(new ServerLoadedListener(), this);
     }
 
     private void setupCommands() {

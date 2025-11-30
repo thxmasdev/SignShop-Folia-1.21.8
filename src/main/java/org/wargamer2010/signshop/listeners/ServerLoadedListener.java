@@ -1,5 +1,6 @@
 package org.wargamer2010.signshop.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -7,6 +8,7 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.wargamer2010.signshop.SignShop;
 import org.wargamer2010.signshop.Vault;
 
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class ServerLoadedListener implements Listener {
@@ -22,5 +24,14 @@ public class ServerLoadedListener implements Listener {
                 SignShop.log("Could not hook into vault's economy. Make sure you have an economy plugin in addition to Vault", Level.WARNING);
             }
         }
+        try {
+            org.wargamer2010.signshop.configuration.Storage.get().processDeferredForLoadedWorlds();
+        } catch (Throwable ignored) {}
+
+        try {
+            Bukkit.getAsyncScheduler().runDelayed(SignShop.getInstance(), task -> {
+                SignShop.log("Loaded " + org.wargamer2010.signshop.configuration.Storage.get().shopCount() + " valid shops (post-load).", Level.INFO);
+            }, 1, TimeUnit.SECONDS);
+        } catch (Throwable ignored) {}
     }
 }

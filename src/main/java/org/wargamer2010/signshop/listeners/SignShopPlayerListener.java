@@ -236,6 +236,13 @@ public class SignShopPlayerListener implements Listener {
                 if (!ssArgs.bDoNotClearClickmap)
                     clicks.removePlayerFromClickmap(player);
 
+                BlockState createdState = bClicked.getState();
+                if (createdState instanceof Sign createdSign) {
+                    if (!createdSign.isWaxed()) {
+                        createdSign.setWaxed(true);
+                        createdSign.update(true, false);
+                    }
+                }
                 signshopUtil.fixCreativeModeSignRendering(event.getClickedBlock(), event.getPlayer());
                 return;
             }

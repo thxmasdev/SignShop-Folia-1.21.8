@@ -101,21 +101,56 @@ public class Storage implements Listener {
             return;
 
         String worldname = event.getWorld().getName();
-        List<String> loaded = new LinkedList<>();
         SignShop.log("Loading shops for world: " + worldname, Level.INFO);
-        for(Map.Entry<String,HashMap<String,List<String>>> shopSettings : deferredSellers.entrySet())
-        {
-            if(shopSettings.getKey().contains(worldname.replace(".", ""))) {
-                if(loadSellerFromSettings(shopSettings.getKey(), shopSettings.getValue()))
-                    loaded.add(shopSettings.getKey());
-            }
+        for(Map.Entry<String,HashMap<String,List<String>>> entry : deferredSellers.entrySet()) {
+            String key = entry.getKey();
+            HashMap<String,List<String>> settings = entry.getValue();
+            if(!key.contains(worldname.replace(".", "")))
+                continue;
+            try {
+                List<String> signList = getSetting(settings, "sign");
+                if (signList.isEmpty())
+                    continue;
+                Location loc = signshopUtil.convertStringToLocation(signList.getFirst(), event.getWorld());
+                if (loc == null)
+                    continue;
+                Bukkit.getRegionScheduler().run(SignShop.getInstance(), loc, task -> {
+                    if (loadSellerFromSettings(key, settings)) {
+                        deferredSellers.remove(key);
+                        Save();
+                    }
+                });
+            } catch (StorageException ignored) {}
         }
+    }
 
-        if(!loaded.isEmpty()) {
-            for(String loadedshop : loaded) {
-                deferredSellers.remove(loadedshop);
-            }
-            Save();
+    public void processDeferredForLoadedWorlds() {
+        if (deferredSellers.isEmpty())
+            return;
+        for (Map.Entry<String, HashMap<String, List<String>>> entry : deferredSellers.entrySet()) {
+            String key = entry.getKey();
+            HashMap<String, List<String>> settings = entry.getValue();
+            try {
+                List<String> worldList = getSetting(settings, "shopworld");
+                if (worldList.isEmpty())
+                    continue;
+                String worldName = worldList.getFirst();
+                World world = Bukkit.getServer().getWorld(worldName);
+                if (world == null)
+                    continue;
+                List<String> signList = getSetting(settings, "sign");
+                if (signList.isEmpty())
+                    continue;
+                Location loc = signshopUtil.convertStringToLocation(signList.getFirst(), world);
+                if (loc == null)
+                    continue;
+                Bukkit.getRegionScheduler().run(SignShop.getInstance(), loc, task -> {
+                    if (loadSellerFromSettings(key, settings)) {
+                        deferredSellers.remove(key);
+                        Save();
+                    }
+                });
+            } catch (StorageException ignored) {}
         }
     }
 
@@ -175,14 +210,24 @@ public class Storage implements Listener {
                 seller_sign = signshopUtil.convertStringToLocation(tempList.getFirst(), world).getBlock();
             } catch(Exception ex) {
                 SignShop.log("Caught an unexpected exception: " + ex.getMessage(), Level.WARNING);
-                // May have caught a FileNotFoundException originating from the chunkloader
-                // In any case, the shop can not be loaded at this point so let's assume it's invalid
                 throw storageEx;
             }
-            if(!itemUtil.clickedSign(seller_sign)) {
-                storageEx.setReason(StorageExceptionReason.SIGN_LOCATION_NOT_ACTUALLY_SIGN);
-                throw storageEx;
+            try {
+                if(!itemUtil.clickedSign(seller_sign)) {
+                    deferredSellers.put(key, sellerSettings);
+                    return false;
+                }
+            } catch (Throwable ex) {
+                deferredSellers.put(key, sellerSettings);
+                return false;
             }
+            try {
+                Sign signState = (Sign) seller_sign.getState();
+                if (!signState.isWaxed()) {
+                    signState.setWaxed(true);
+                    signState.update(true, false);
+                }
+            } catch (Throwable ignored) {}
             seller_activatables = signshopUtil.getBlocksFromLocStringList(getSetting(sellerSettings, "activatables"), world);
             seller_containables = signshopUtil.getBlocksFromLocStringList(getSetting(sellerSettings, "containables"), world);
             seller_items = itemUtil.convertStringtoItemStacks(getSetting(sellerSettings, "items"));
