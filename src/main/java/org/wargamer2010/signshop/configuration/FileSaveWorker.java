@@ -1,6 +1,6 @@
 package org.wargamer2010.signshop.configuration;
 
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -9,7 +9,6 @@ import org.wargamer2010.signshop.SignShop;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class FileSaveWorker implements Runnable {
@@ -17,7 +16,7 @@ public class FileSaveWorker implements Runnable {
     File ymlfile;
     String fileName;
     private final LinkedBlockingQueue<FileConfiguration> saveQueue = new LinkedBlockingQueue<>();
-    private ScheduledTask scheduledTask;
+    private BukkitTask scheduledTask;
 
     public FileSaveWorker(File ymlfile) {
         this.ymlfile = ymlfile;
@@ -32,7 +31,7 @@ public class FileSaveWorker implements Runnable {
     }
 
     public void start(Plugin plugin) {
-        scheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, task -> run(), 50, 50, TimeUnit.MILLISECONDS);
+        scheduledTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, this::run, 1L, 1L);
     }
 
     public void queueSave(FileConfiguration config) {

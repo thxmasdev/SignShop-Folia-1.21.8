@@ -114,7 +114,7 @@ public class Storage implements Listener {
                 Location loc = signshopUtil.convertStringToLocation(signList.getFirst(), event.getWorld());
                 if (loc == null)
                     continue;
-                Bukkit.getRegionScheduler().run(SignShop.getInstance(), loc, task -> {
+                Bukkit.getScheduler().runTask(SignShop.getInstance(), () -> {
                     if (loadSellerFromSettings(key, settings)) {
                         deferredSellers.remove(key);
                         Save();
@@ -144,7 +144,7 @@ public class Storage implements Listener {
                 Location loc = signshopUtil.convertStringToLocation(signList.getFirst(), world);
                 if (loc == null)
                     continue;
-                Bukkit.getRegionScheduler().run(SignShop.getInstance(), loc, task -> {
+                Bukkit.getScheduler().runTask(SignShop.getInstance(), () -> {
                     if (loadSellerFromSettings(key, settings)) {
                         deferredSellers.remove(key);
                         Save();

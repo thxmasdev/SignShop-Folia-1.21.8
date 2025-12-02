@@ -1,6 +1,6 @@
 package org.wargamer2010.signshop.timing;
 
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.MemorySection;
@@ -31,7 +31,7 @@ public class TimeManager extends TimerTask {
     private final FileSaveWorker fileSaveWorker;
     private File storageFile;
     private YamlConfiguration storageConfiguration = null;
-    private ScheduledTask scheduledTask;
+    private BukkitTask scheduledTask;
 
     public TimeManager(File storage) {
         storageFile = storage;
@@ -242,7 +242,7 @@ public class TimeManager extends TimerTask {
     }
 
     private void scheduleCheck() {
-        scheduledTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(SignShop.getInstance(), task -> this.run(), 1, getTicks());
+        scheduledTask = Bukkit.getScheduler().runTaskTimer(SignShop.getInstance(), this::run, 1L, getTicks());
     }
 
     private int getTicks() {

@@ -8,7 +8,6 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.wargamer2010.signshop.SignShop;
 import org.wargamer2010.signshop.Vault;
 
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class ServerLoadedListener implements Listener {
@@ -29,9 +28,9 @@ public class ServerLoadedListener implements Listener {
         } catch (Throwable ignored) {}
 
         try {
-            Bukkit.getAsyncScheduler().runDelayed(SignShop.getInstance(), task -> {
+            Bukkit.getScheduler().runTaskLater(SignShop.getInstance(), () -> {
                 SignShop.log("Loaded " + org.wargamer2010.signshop.configuration.Storage.get().shopCount() + " valid shops (post-load).", Level.INFO);
-            }, 1, TimeUnit.SECONDS);
+            }, 20L);
         } catch (Throwable ignored) {}
     }
 }

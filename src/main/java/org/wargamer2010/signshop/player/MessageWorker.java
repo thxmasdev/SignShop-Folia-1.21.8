@@ -29,7 +29,7 @@ public class MessageWorker implements Runnable {
                 return;
             if (instance == null)
                 instance = new MessageWorker();
-            Bukkit.getAsyncScheduler().runNow(SignShop.getInstance(), task -> instance.run());
+            Bukkit.getScheduler().runTaskAsynchronously(SignShop.getInstance(), instance);
             bWorking = true;
         }
     }
@@ -77,11 +77,11 @@ public class MessageWorker implements Runnable {
         String appender = (message.getCount() > 0 ? (" " + SignShop.getInstance().getSignShopConfig().getError("repeated_x_times", pars)) : "");
         Player player = message.getPlayer().getPlayer();
         if (player != null) {
-            player.getScheduler().run(SignShop.getInstance(), task -> {
+            Bukkit.getScheduler().runTask(SignShop.getInstance(), () -> {
                 message.getPlayer().sendNonDelayedMessage(message.getMessage() + appender);
                 message.clrCount();
                 message.setLastSeen(System.currentTimeMillis());
-            }, null);
+            });
         }
     }
 

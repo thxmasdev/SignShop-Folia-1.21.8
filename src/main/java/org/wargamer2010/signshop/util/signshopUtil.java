@@ -638,7 +638,7 @@ public class signshopUtil {
     public static void fixCreativeModeSignRendering(Block block, Player player){
         if (player.getGameMode() == GameMode.CREATIVE && block.getState() instanceof Sign ) {
             Sign sign = (Sign) block.getState();
-            player.getScheduler().runDelayed(SignShop.getInstance(), task -> sendSignUpdate(player,sign), null, 2);
+            org.bukkit.Bukkit.getScheduler().runTaskLater(SignShop.getInstance(), () -> sendSignUpdate(player, sign), 2L);
         }
     }
 
